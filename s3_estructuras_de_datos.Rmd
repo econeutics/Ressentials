@@ -1,0 +1,1146 @@
+---
+title: "Sesión 3. Estructuras de datos en R"
+author: "Raymundo Durán"
+subtitle: Operaciones, características y uso
+output:
+  html_document:
+    df_print: paged
+  html_notebook: default
+  pdf_document: default
+---
+```{r, echo=FALSE}
+install.packages("gapminder")
+
+```
+
+
+En esta sesión vamos a **conocer**, **manipular** y **operar** las [*principales* estructuras de datos en R]{style="color:red"}.
+
+Hacia el final de la sesión también vamos a unir nuestro conocimiento de \*\*loops\* con esta lección para [poblar y generar tablas]{style="color:red"}
+
+# Clases básicas en R
+
+Vamos a trabajar con 3 clases generales de variables:
+
+-   **Numéricas**: enteros(int) y decimales(numeric)
+-   **Caracteres**: 'strings' de texto(character)
+-   **Lógicas**: verdadero/falso(logical)
+
+## Numéricas
+
+Además de las que ya hemos visto, algunas constantes como $\pi$, $e$, $e^2$, etc.
+
+```{r}
+1 #integer
+
+1.3 #numeric
+ 
+pi #numeric
+
+exp(1)
+exp(2) 
+
+
+
+```
+
+### Identificar la clase con `class`
+
+```{r}
+class(1) #La toma como decimal
+
+class(pi)
+
+class("1") #?
+
+```
+
+## Caracteres
+
+Se escriben siempre entre comillas
+
+```{r}
+
+
+uno <- "1"
+
+
+mi_nombre <- "Raymundo"
+mi_nombre
+class(mi_nombre)
+
+dos <- 2
+
+```
+
+¿Podemos sumar `uno` y `dos`?
+
+```{r}
+#"1" + dos
+```
+
+R no sabe cómo sumar un caracter con un numérico. Más de esto en breve.
+
+## Lógicos
+
+Los caracteres `T`/ `TRUE` y `F` / `FALSE` tienen un significado especial:
+
+```{r}
+TRUE
+```
+
+Normalmente **no los escribimos** sino que son el resultado de operaciones que hacemos.
+
+Ejemplo:
+
+$$\sqrt{4} > 3\; ?$$
+
+```{r}
+
+sqrt(4) > 3
+```
+
+$$5 \neq 3 $$
+
+```{r}
+5 != 3
+
+```
+
+Si la expresión que evaluamos es cierta, el resultado es `T` y viceversa.
+
+```{r}
+
+falsa <- 2>2
+falsa
+class(falsa)
+
+verdadera <- (2+3) > (2+2)
+verdadera
+class(verdadera)
+```
+
+### Operadores relacionales
+
+-   $$a \geq b $$ se escribe **`a >= b`**, a es mayor o igual que b.
+-   $$a < b $$ se escribe **`a < b`**, a es menor que a.
+-   $$a \leq b $$ se escribe **`a <= b`**, a es menor o igual que b.
+-   $$a = b $$ se escribe **`a == b`**, (doble signo de igual), a es igual que b.
+-   $$a \neq b $$ se escribe **`a != b`**, a es mayor que b.
+
+```{r}
+#Para nuestros fines, lo mismo
+b = 2
+b <- 2
+
+## Para operador lógico
+
+ b != 2
+
+ 
+```
+
+Más de operaciones lógicas en breve. ¿Se acuerdan de `uno + dos` ?
+
+```{r}
+dos + TRUE #?
+
+#No se puede operar
+#Puedo convertir alguna de las variables a otro tipo?
+# TRUE = 1, FALSE = 0
+#TRUE = 1
+
+# (dos =2) + (TRUE = 1) = 3
+
+
+```
+
+[R no mezcla peras con manzanas]{style="color:red"}. Lo que estamos viendo es un proceso por el cual R **forza** a `TRUE` a adquirir un valor númerico igual a 1 y DESPUÉS realiza la suma.
+
+## Coerción de tipo
+
+R sabe cómo transformar algunas clases a otras dependiendo del contexto. A veces puede hacerlo de manera [automática]{style="color:blue"}, y otras tantas nos conviene coercionar de manera [manual]{style="color:blue"} con la función `as.tipo()`
+
+```{r}
+##Automáticas
+
+2 - (5!=5) #Falso = 0
+
+sum(T,T,F,T,F,F,F) # 3 T, 3F
+
+
+
+```
+
+### Coerción manual: `as.tipo()`
+
+Si R no encuentra ambigüedades, puede transformar de una clase a otra:
+
+-   Escribir `as.` y la `clase` a la que quiere convertir
+-   En los argumentos, escribir la variable original
+
+```{r}
+uno <- as.numeric("1")
+
+class(uno)
+uno + dos
+
+
+as.numeric("pi")
+
+pi
+
+
+```
+
+¿Se acuerdan que había tipo integer?
+
+```{r}
+
+uno <- as.integer(uno)
+
+uno
+class(uno)
+
+```
+
+```{r}
+
+as.integer(3.9)
+
+#Paréntesis: también lo podemos lograr con las funciones round o floor
+
+round(4.51)
+```
+
+```{r}
+
+round(3.4)
+
+floor(3.9) #Encontrar el entero inferior
+
+round(3.6)
+
+
+```
+
+Otras coerciones
+
+```{r}
+
+as.logical("TRUE")
+
+as.character(24435)
+
+as.numeric(FALSE)
+
+
+```
+
+## Lógicos II: operadores lógicos
+
+Vamos a ver dos operadores lógicos:
+
+-   operador **Y**: `&`, disyunción. `a & b` es TRUE sólo si a es TRUE y b es TRUE. En cualquier otro caso es FALSE.
+
+-   operador **O**: `|` (`Alt`+ 124, `Option`+ 1 Mac Latam), conjunción, `a & b` es FALSE sólo si a es FALSE y b es FALSE. En cualquier otro caso es TRUE.
+
+Ejemplos:
+
+```{r}
+
+# 10 mayor que 9 |  5 no es igual a 5
+
+(10 > 9) | (5!=5)
+
+##############################
+
+mi_nombre = "Raymundo"
+mi_edad = 30
+
+# Mi nombre es 'Raymundo' & NO tengo 15 años. 
+
+(mi_nombre == "Raymundo") & (mi_edad != 15)
+ 
+
+```
+
+# Ejercicios
+
+## Ejercicio 1 (lo hacemos juntos):
+
+```{r}
+
+hija <- 10
+padre <- 35
+madre <- 33
+
+# ¿Es cierto que la suma de las edades de la familia es menor que 70?
+#(hija + padre + madre) < 70
+
+# ¿Es cierto que el padre es mayor que la madre y que 4 veces la edad de la hija?
+
+#(padre > madre) & (padre > 4*hija)         
+
+# ¿Cuántos de estos enunciados son verdad?
+# 
+# ## La madre es al menos 3 veces mayor que la hija
+# ## El padre y la hija sumados le doblan la edad a la madre
+# ## La suma de las edades de la madre y la hija es 43
+
+a <- (madre > 3*hija) 
+
+b <- ((padre + hija) == 2*madre)
+
+c <- ((madre + hija) == 43)
+
+a+ b+ c
+
+sum(a,b,c)
+
+
+```
+
+## Ejercicio 2: script.
+
+# Estructuras de datos en R
+
+Vamos a ver las 4 estructuras de datos principales en R, en orden de complejidad:
+
+-   Vectores
+-   Matrices
+-   Data.Frames
+-   Listas
+
+Para cada una: construcción, acceso a sus elementos, operaciones.
+
+## Vectores
+
+Un vector es un **conjunto ordenado** de elementos de la **misma** clase.
+
+La sintaxis es: `c(elemento1, elemento2, ...., elemento1000)`
+
+Recordemos: tienen que ser TODOS de la misma clase.
+
+```{r}
+
+vector_numerico <- c(1,7,6,15,1,2)
+vector_numerico
+
+vector_numerico2 <- 1:10 #Abreviación conveniente
+vector_numerico2
+
+vector_numerico3 <- seq(0,100,10)
+vector_numerico3
+
+vector_numerico4 <- runif(10) #random uniform (número del 0 al 1, 10 veces)
+vector_numerico4
+
+class(vector_numerico3)
+
+```
+
+¿Qué pasa si agrego un elemento que no es de la clase? **Coerción de tipo**
+
+```{r}
+
+vector_error <- c("1", 2 ,3)
+
+vector_error
+
+class(vector_error)
+
+```
+
+```{r}
+
+c(TRUE, 5,100, FALSE)
+
+```
+
+```{r}
+    vector_nuevo <- 2:15
+    vector_nuevo
+    vector_nuevo -1
+    
+    vector_nuevo == 13
+    
+```
+
+### Armar un vector lógico
+
+Podemos evaluar un vector numérico contra UNA condición lógica de la siguiente forma:
+
+```{r}
+
+v1 <- 1:10
+
+v1_logico <- (v1 <=5)  ## Pregunta cuáles elementos son menores o iguales a 5
+
+v1_logico
+
+```
+
+¿Cuántos días "llovió"?
+
+```{r}
+?sum
+
+
+sum(v1_logico)
+vector_numerico
+```
+
+## Accesar vectores
+
+Podemos accesar **uno o más elementos** de nuestros vectores de manera individual. Existen 2 formas de accesarlos.
+
+### Por posición
+
+La sintaxis es:
+
+-   `vector[posición]` para un sólo elemento, ó
+-   `vector[vector_posiciones]` para varios
+
+Ejemplo:
+
+```{r}
+
+vector_numerico
+
+#El número 15 está en la posición 4:
+
+vector_numerico[4]
+
+## Las posiciones de los 1s son 1 y 5:
+
+vector_numerico[c(1,5)]
+
+
+```
+
+### Por 'lógica' o condiciones:
+
+La sintaxis: tenemos un `vector lógico` que evaluó algún criterio (¿Qué día la temp fue mayor que 30 grados?) del `vector`
+
+Los elementos 'correctos' del `vector` se consiguen con `vector[vector_logico]`
+
+```{r}
+
+v1_logico
+v1
+
+v1[v1_logico]
+
+
+```
+
+# Matrices
+
+Las matrices son un conjunto de vectores (también el data.frame).
+
+No me voy a meter demasiado en matrices, porque para DS es mejor usar el `data.frame`. Las matrices también son de UNA SOLA CLASE (coerción de tipo de lo contrario).
+
+Sintaxis: `matrix[vector/vectores, nrow, ncol]`
+
+```{r}
+
+v_1al9 <- 1:9
+
+matriz <-matrix(v_1al9, ncol = 3)
+matriz
+
+#Modificamos filas, columnas
+
+```
+
+Fíjate en la circulación: de arriba hacia abajo, de izquierda a derecha
+
+## Accesar matrices
+
+Accesamos los elementos por posición fila y columna de la siguiente forma:
+
+Sintaxis `matriz[pos_fila, pos_columna]` igual que con los vectores, se puede utilizar **vector posición** y **vector lógico**
+
+```{r}
+matriz[1,3] #el elemento de la primera fila y tercera columna 
+
+matriz[c(1,2),c(1,2)] #el cuadro superior izquierdo
+
+```
+
+```{r}
+matriz_l <- matriz >= 4
+matriz_l
+resultado <- matriz[matriz_l]
+resultado
+
+
+```
+
+Me coercionó a vector, porque las dimensiones no eran adecuadas.
+
+## Selección de la forma `[fila,   ]` ó `[   , columna]`
+
+Cuando en una matriz (o más adelante en un `data.frame`) **NO** especificamos una posición, ya sea fila o columna, estamos indicando que deseamos **todos** los elementos.
+
+```{r}
+matriz
+
+matriz[   ,3] #La tercera columna, y TODOS los elementos (3 x 1) fila
+
+matriz[c(1,3),] # La primera y tercera filas, y TODOS los elementos (2 x 3) columna
+
+
+matriz[ , ] # todos los elementos fila y columna (3 x 3)
+
+
+```
+
+# Paréntesis: nombres (`names`), nombres fila (`rownames`) y nombres columna(`colnames`).
+
+Además de una posición, R permite asignar **nombres** a vectores, matrices, dfs y listas. El papel más importante de los nombres en un objeto de R, es **ayudar a la selección**.
+
+```{r}
+
+
+# Precio promedio/noche en varias ciudades (USD)
+
+vector_con_nombres <- c( NYC = 250,
+                         Londres = 200,
+                         CDMX = 85,
+                         Paris = 180)
+
+
+
+
+vector_con_nombres
+
+```
+
+Y podemos seleccionar por nombres con la sintaxis de vector habitual:
+
+1.  Creamos `vector_nombres <- c("nombre1, "nombre2", ...)`
+
+2.  Seleccionamos los elementos correspondientes del vector con `vector[vector_nombres]`
+
+```{r}
+
+ciudades_americanas <- c("NYC", "CDMX")
+
+vector_con_nombres[ciudades_americanas]
+```
+
+También podemos usar `names()` para obtener los nombres de un objeto:
+
+```{r}
+names(vector_con_nombres)
+```
+
+La que acabo de mostrar [no es la mejor forma asignar nombres]{style="color:red"}. Hay muchos casos donde nombrar elementos uno a uno, **no es práctico**.
+
+## `names(objeto) <- vector_nombres` para vectores y matrices
+
+```{r}
+
+
+
+v7 <- c(1,2,3)
+
+names(v7) <- c("izquierda", "centro", "derecha")
+
+v7
+
+```
+
+### Nombres para arreglos \[fila, columna\]
+
+En el caso de una matriz tenemos dos posiciones, por lo que hay que **especificar fila/columna** con `rownames() <-` y `colnames() <-`:
+
+```{r}
+
+rownames(matriz) <- c("arriba", "centro fila", "abajo" )
+
+matriz
+
+```
+
+```{r}
+
+colnames(matriz) <- c("izquierda", "centro col", "derecha")
+
+matriz
+```
+
+```{r}
+matriz[ c("centro fila", "abajo"), "izquierda"]
+```
+
+Finalmente, podemos borrar los nombres con `names() <- NULL`
+
+```{r}
+
+rownames(matriz) <- NULL
+matriz
+#######
+
+colnames(matriz) <- NULL
+matriz
+
+```
+
+# Data frame
+
+No hagan mucho caso al siguiente bloque.
+
+```{r}
+stats_mundiales <- as.data.frame(gapminder::gapminder )
+stats_mundiales <- stats_mundiales[sample(1:nrow(stats_mundiales), 20), 1:5]
+
+
+stats_mundiales
+class(stats_mundiales)
+
+##Datasets (conjuntos de datos)
+
+```
+
+```{r}
+colnames(stats_mundiales)
+```
+
+Un `data.frame` (df) es un arreglo de **columnas estructuradas** de igual longitud.
+
+**Es diferente** de una matriz en varias formas:
+
+-   Puede contener distintos tipos de variables
+
+    -   Un tipo en cada columna.
+
+-   Cada columna tiene **siempre** un nombre
+
+-   Acepta muchas más operaciones que una matriz
+
+    -   Permite **crear** nuevas columnas adyacentes y agregar columnas con base en una variable.
+
+    -   Permite combinar `data.frame`s de igual estructura.
+
+-   Entre otras que no veremos de inmediato.
+
+## Crear un `data.frame`
+
+La sintaxis para crear un data frame es `data.frame(nombre1 = vector1, nombre2 = vector 2, ... )`, recuerda que **todos los vectores deben ser de igual longitud.**
+
+```{r}
+
+df <- data.frame(numerica = 1:5,
+                 caracteres = c("uno", "dos", "tres", "cuatro", "cinco"))
+
+df
+```
+
+¿Podemos **coercionar** nuestra matriz a df?
+
+```{r}
+matriz
+df_matriz <- as.data.frame(matriz)
+
+df_matriz
+
+
+```
+
+¿Y de df a matriz?
+
+```{r}
+as.matrix(df_matriz)
+```
+
+## Operaciones y acceso a elementos de dfs
+
+### Selección por posición y nombres
+
+Esta selección funciona igual que con una matriz:
+
+```{r}
+stats_mundiales
+```
+
+```{r}
+
+#### Posición
+
+stats_mundiales[1,   ] # La primera fila del df
+
+
+```
+
+```{r}
+
+stats_mundiales[  , c(1,5)] # Las variables de país y población de todo el df
+
+
+rownames(stats_mundiales) <- NULL
+```
+
+```{r}
+
+stats_mundiales[3, "lifeExp"] # La expectativa de vida del tercer país
+
+
+```
+
+```{r}
+
+stats_mundiales[c(3,19),
+                c("country","continent", "year")] #País,cont, año de 3 y 19
+
+```
+
+### Selección con el operador \$: `data.frame$nombre_variable`
+
+Si requerimos utilizar **una columna** de un df a la vez, el atajo \$ puede ser útil
+
+```{r}
+
+stats_mundiales$country #Lista de países
+
+as.data.frame(stats_mundiales$country)
+```
+
+Podemos operar estos vectores como cualquier otro:
+
+```{r}
+poblacion_p1000 <- stats_mundiales$pop/1000
+poblacion_p1000
+
+```
+
+También podemos crear nuevas variables con \$:`df$variable_nueva <- 1, n_filas df`
+
+```{r}
+stats_mundiales$pob_1k <- stats_mundiales$pop/1000
+
+stats_mundiales
+```
+
+Importante recordar al crear una variable: los dfs aceptan inputs de tamaño 1, o del tamaño del **largo** del df.
+
+```{r}
+
+df$nueva_variable <- 1
+
+df
+
+```
+
+```{r}
+runif(1)
+df$num_aleatorio <- runif(5)
+df
+## ó 1 ó número de filas
+```
+
+### Funciones MUY útiles al operar con dfs, matrices, vectores
+
+Vamos a ver algunas **funciones simples** para operar las estructuras que acabamos de conocer con mayor facilidad:
+
+-   `nrow()` / `ncol()`: regresan el número de filas y columnas que tienen matrices y dfs.
+
+    -   `length()`: regresa el número de elementos de un vector.
+
+-   `min()` / `max()` regresan el mínimo y máximo de un vector numérico.
+
+-   `sum()` / `mean()`, regresan la suma total y la media de un vector numérico.
+
+```{r}
+stats_mundiales
+
+nrow(stats_mundiales)
+matriz
+nrow(matriz)
+
+
+```
+
+```{r}
+ncol(stats_mundiales)
+ncol(matriz)
+
+```
+
+```{r}
+
+vector_con_nombres
+length(vector_con_nombres)
+
+#ncol(vector_con_nombres) 
+#nrow(vector_con_nombres)
+
+length(stats_mundiales)
+
+```
+
+¿Cuál es el mínimo de población de nuestro \`stats_mundiales\`?
+
+```{r}
+stats_mundiales$pop
+min(stats_mundiales$pop)
+
+
+```
+
+¿Cuál es la esperanza de vida media?
+
+```{r}
+mean(stats_mundiales$lifeExp)
+
+matriz
+median(matriz)
+
+```
+
+### Selección lógica de dfs
+
+Funciona de la misma manera de que la selección con matrices. Lo que cambia es que, con un df, nos interesa seleccionar por **condiciones** que cumplen (o no) las distintas variables **fila por fila**.
+
+1.  Creamos vectores lógicos con condiciones de las variables
+
+    (ejemplo, `vector_logico <- df$variable > 100`).
+
+2.  Podemos combinar VARIOS vectores lógicos:
+
+    `vector_filtro <- vector_logico1 & (vector_logico2 | vector_logico3)`.
+
+3.  seleccionamos las **filas** que cumplen las condiciones 1 y (2 ó 3) con `df[vector_filtro,    ]`
+
+Paréntesis: qué pasa con vectores lógicos
+
+```{r}
+
+verdaderos <- c(TRUE, TRUE)
+falsos <- c(FALSE, FALSE)
+
+vf <- c(TRUE, FALSE)
+
+verdaderos & falsos
+verdaderos & vf
+verdaderos | falsos
+
+```
+
+```{r}
+stats_mundiales
+
+```
+
+Vamos a seleccionar todos los países en África **por pasos**. Primero creamos el vector lógico a partir de la condición de que la variable `continent` sea igual a Africa.
+
+```{r}
+
+vector_logico_africa <- (stats_mundiales$continent == "Africa")
+vector_logico_africa
+
+
+```
+
+Ahora introducimos este vector en nuestro `df[fila,]` y NADA en columna (o podemos filtrar las columnas que quisiéramos usar en nuestro análisis. El caso es que filtramos lógicamente **por filas**).
+
+```{r}
+
+stats_mundiales[vector_logico_africa,   ]
+
+```
+
+Ahora vamos a hacer un ejemplo con múltiples condiciones. Primero recordemos qué pasa cuando operamos vectores lógicos en la forma `vector_logico1 & vector_logico2` .
+
+```{r}
+
+Trues <- c(TRUE,TRUE)
+
+Falses <- c(FALSE, FALSE)
+
+Truefalse <- c(TRUE,FALSE)
+
+
+
+```
+
+Queremos obtener *los países africanos que NO sean Nigeria, que tengan una **(esperanza de vida por encima de 65 años ó por debajo de 50)**, y para observaciones ANTES del año 2000.*
+
+Como antes, comenzamos por definir nuestras condiciones lógicas:
+
+```{r}
+
+## Continente africano
+africa <- stats_mundiales$continent == "Africa"
+
+## País no es Nigeria
+no_nigeria <- stats_mundiales$country != "Nigeria"
+
+## EV encima de 65
+
+lifexp_65 <- stats_mundiales$lifeExp > 65
+
+## EV debajo de 50 
+lifexp_50 <- stats_mundiales$lifeExp < 50
+
+## Antes del 2000
+antes_2000 <- stats_mundiales$year < 2000
+
+no_nigeria
+africa
+lifexp_50
+
+```
+
+Operamos nuestras condiciones lógicas (en vectores) en concordancia con lo requerido:
+
+```{r}
+
+vector_filtro2 <- africa & no_nigeria & (lifexp_65 | lifexp_50) & antes_2000
+vector_filtro2
+```
+
+Usamos selección lógica **en las filas** a partir del filtro creado
+
+```{r}
+stats_mundiales[vector_filtro2,]
+
+```
+
+## Ejercicio 1 (todos juntos)
+
+1.  Escriba unas líneas de código que regresen el VECTOR CON máximo y mínimo de cualquier vector
+
+    ```{r}
+    v <- c(-15,7,9,1000000,2,2000, 3, 10, 2)
+
+    ### Métodos lógicos
+    max(v)
+
+    vector_filtro <- (v== max(v)) | (v == min(v))
+
+    vector_filtro
+
+    v[vector_filtro]
+
+    ```
+
+    1.  Escriba unas líneas de código que regresen LA POSICIÓN del máximo y mínimo de cualquier vector.
+
+    ```{r}
+
+    vector_filtro <- (v== max(v)) | (v == min(v))
+
+    ## función
+
+    vector_posiciones <- which(vector_filtro)
+
+    vector_posiciones
+
+
+
+    ```
+
+    ```{r}
+    ## Nombres 
+
+    length(v)
+
+    names(v) <- 1:length(v)
+
+    v[vector_filtro]
+
+
+    ```
+
+2.  Cargue el dataset `gapminder` ENTERO
+
+    ```{r}
+    #Ignorar este bloque
+    gapminder <- as.data.frame(gapminder::gapminder)
+
+
+    gapminder
+    ```
+
+3.  Número de filas y columnas de `gapminder`
+
+    ```{r}
+    nrow(gapminder)
+    ncol(gapminder)
+
+    dim(gapminder)
+
+    str(gapminder)
+
+    ```
+
+4.  ¿Cuál es la esperanza de vida media de los países en América en 1982? ¿Y en 2002?
+
+5.  
+
+    ```{r}
+    matrix(1:16, nrow = 4)
+    ```
+
+6.  
+
+    ```{r}
+
+
+    ### Filtrar por las condiciones
+
+    paises_america <- gapminder$continent == "Americas"
+    year_1982 <- gapminder$year == 1982
+
+    ### Operar condiciones
+    vector_filtro_gapminder <- paises_america & year_1982
+
+    ## alimentar vector_filtro
+
+    gapminder_am1982 <- gapminder[vector_filtro_gapminder, ]
+
+    gapminder_am1982
+    # Sacar la media
+    mean(gapminder_am1982$lifeExp)
+
+    ```
+
+7.  Haga un dataframe `df_especial` que contenga todos los países que no son España, Francia o Alemania, o no están en África, en 2007.
+
+    ## Operador %in%
+
+    ```{r}
+
+    c(1,2,3,4,5) %in% c(5,6) 
+    ```
+
+    ```{r}
+
+    year_2007 <- gapminder$year == 2007
+
+    europeos <-  gapminder$country %in% c("Spain", "France", "Germany")
+
+    africanos <- gapminder$continent == "Africa"
+
+    #NO son 3 europeos
+    #NO es Africa
+
+    vector_filtro_ex1 <- (!europeos)& (!africanos) & year_2007
+
+    df_especial <- gapminder[vector_filtro_ex1, ]
+    df_especial
+    ```
+
+8.  ¿Cuál es la población total del conjunto de esos países en ese año?
+
+    ```{r}
+    sum(df_especial$pop)
+    ```
+
+## Ejercicio 2
+
+Script `s3_2`(10 min)
+
+# Listas
+
+Son **arreglos ordenados** que, por cada elemento, pueden contener:
+
+-   Clases básicas
+
+-   Vectores
+
+-   Matrices
+
+-   Data.Frames
+
+-   Otras listas (que a su vez pueden contener todos los anteriores, u otras listas).
+
+Las listas son objetos muy útiles para una serie de tareas *distintas* a las del df, en donde este último resulta deficiente ya sea por [su condición de longitud]{style="color:blue"} o su restricción de un tipo de variable
+
+Para **ciencia de datos**, estamos pensando fundamentalmente en 2 aplicaciones:
+
+-   Requests a servicios de API (AWS, Google Cloud, cualquier otro SaaS) **si no sabes qué es esto, no te preocupes.**
+
+-   Webscrapping
+
++-----------+----------------------------------------+-----------------------------------------------------------------------------------------------------------------+-------------------------------+
+| Nombre    | Películas que le gustaron              | Películas que NO le gustaron                                                                                    | Mascotas                      |
++===========+========================================+=================================================================================================================+===============================+
+| Karla     | "Shrek"                                | "Toy Story 1"                                                                                                   | NA                            |
++-----------+----------------------------------------+-----------------------------------------------------------------------------------------------------------------+-------------------------------+
+| Alejandro | NA                                     | "Harry Potter 1", "Harry Potter 2", "Harry Potter 3", "Harry Potter 4", "Harry Potter 5", "Harry Potter 6", ... | 1 Perro                       |
++-----------+----------------------------------------+-----------------------------------------------------------------------------------------------------------------+-------------------------------+
+| Renata    | "Toy Story 1", "Toy Story 2", "Batman" | NA                                                                                                              | 4 gatos, 1 perro, 1 tarántula |
++-----------+----------------------------------------+-----------------------------------------------------------------------------------------------------------------+-------------------------------+
+
+: Ejemplo: datos semiestructurados
+
+Por otro lado, una lista es en general mucho más difícil de manipular y operar que un df.
+
+## Crear una lista
+
+La sintaxis es `list(objeto1, objeto2, objeto3)`
+
+```{r}
+
+primera_lista <- list(1,
+                      "dos",
+                      matriz,
+                      gapminder,
+                      list(vector_con_nombres, 3)
+                      )
+primera_lista
+```
+
+## Accesar una lista
+
+La sintaxis, para una lista con k elementos es:
+
+`lista[[elemento]][sintaxis del objeto]`
+
+Donde elemento puede ser seleccionado por posición o por nombre
+
+```{r}
+
+## Accesar gapminder
+primera_lista[[4]]$lifeExp[3]
+
+```
+
+```{r}
+## Accesar a lista de lista, para el vector de noches de hotel
+
+primera_lista[[5]][[1]]
+
+primera_lista[[5]][[1]]["Londres"]
+```
+Accesando una lista por nombre
+```{r}
+names(primera_lista) <- c("numero","caracter", "matriz", "dataframe", "otra_lista")
+```
+
+```{r}
+
+primera_lista[["dataframe"]]
+
+```
+
+
+
+Por último, un comentario:
+
+> Un `data.frame` es una lista con estructura especial.
+
+Demostración
+
+```{r}
+gapminder[["lifeExp"]][1:10]
+gapminder[["lifeExp"]][2]
+```
+
+
+
+Fin de la sesión.

@@ -1,0 +1,902 @@
+---
+title: 'Sesión 4: Control de flujo'
+author: "Raymundo Durán"
+subtitle: Loops, condicionales, loops condicionales y otras sentencias
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+En esta sesión:
+
+-   Funcionamiento **a detalle** de loops y condicionales.
+
+-   Extensiones y **objetos auxiliares** de loops.
+
+-   Loop **condicional**.
+
+-   Instrucciones **especiales** de comando
+
+# Loops *for* (longitud determinada).
+
+Recordemos la estructura básica de un loop:
+
+![](esquema_for.png "Esquema de un loop for"){width="350"}
+
+En la consola:
+
+```{r}
+
+vector <- c()
+
+for (variable in vector) {
+        
+####### Aquí el bloque de código que queremos que se ejecute
+####### con la variable tomando valores del vector.         
+        
+}
+
+
+
+```
+
+Ejemplo dibujado.
+
+-   A cada *vuelta* del loop también se le llama **iteración**.
+-   De ahí que al vector también se le conozca como un **objeto iterable**.
+
+Un primer ejemplo en consola:
+
+```{r}
+
+for (numero in c(1,2,3,4,5)) {
+        
+        print("Iteración número:")
+        print(numero) ## Mi variable irá cambiando su valor a 1,2,3,4,5
+}
+
+```
+
+Fijémonos en la consola por el valor de `numero`.
+
+## Los vectores
+
+-   El **número de iteraciones** de un loop for es `length(vector)`.
+
+-   Estas iteraciones van a ocurrir **sin importar** lo que hagamos con la variable. Ejemplo:
+
+```{r}
+
+v3 <- c(1,2,3)
+length(v3)
+
+for ( variable in v3) {
+        
+        print("Esta es una iteración") #Bloque de código
+}
+
+
+
+```
+
+En el ejemplo anterior la variable no aparece en ningún lado, pero **la iteración sucede**. El bloque de código se ejecuta 3 veces, siendo 3 el largo del vector `v3`.
+
+### Vectores de cualquier tipo
+
+Un loop for **no se restringe a vectores numéricos**. La única restricción que existe es la del vector: elementos de **la misma clase**. Ejemplos:
+
+#### Caracteres
+
+```{r}
+# Vector de caracteres
+
+v_mascotas <- c("perros", "gatos", "hamsters", "conejos")
+length(v_mascotas)
+
+for (variable in v_mascotas) {
+        
+# Iteramos v_mascotas en la variable 'mascotas' y la imprimimos.         
+        
+        mascotas <- paste("Los", variable, "son buenas mascotas")
+        
+        print(mascotas)
+        
+}
+
+
+
+```
+
+```{r}
+
+pegado <- paste("uno,","dos,", "tres")
+pegado
+```
+
+#### Lógicos
+
+```{r}
+
+v_logico <- c(T, F, T, F, T)
+length(v_logico)
+
+for (variable in v_logico) {
+        
+        print(variable == TRUE)
+        z <- 10
+        print(z)
+}
+
+
+```
+
+Importante: usamos `print()` porque queremos que la operación del loop se imprima en la consola a manera de ejemplo, pero **el código se ejecuta igualmente**.
+
+```{r}
+for (variable in v_logico) {
+        
+        z <- variable == TRUE
+        
+}
+
+```
+
+Por último, esto se puede deducir de lo que hemos visto, pero un loop numérico **no tiene por qué ser secuencial**:
+
+```{r}
+
+v_desordenado <- c(100, 8, 1, 15, 20, 1,2,3,4)
+
+for (variable in v_desordenado){
+        
+        suma <- sum(variable, variable^2, 1)
+        print(suma)
+        
+}
+
+```
+
+## Iterar sobre vectores, matrices, dfs
+
+Las aplicaciones **naturales** de un loop de longitud determinada:
+
+-   Crear o modificar **valores** de una tabla.
+
+-   **Guardar tablas** filtradas para su uso posterior.
+
+```{r}
+## Creamos una matriz 5x5
+
+m_5 <- matrix(1:25, nrow = 5)
+
+m_5
+nrow(m_5)
+
+```
+
+Queremos cambiar todos los elementos diagonales a `NA`. Es decir, queremos hacer `m_5[1,1] = NA`, `m_5[2,2] = NA`, ... etc.
+
+```{r}
+
+for (i in 1:nrow(m_5)) {
+        
+        m_5[i,i] = NA
+}
+
+m_5
+
+```
+
+Pensemos que esto lo podemos hacer con una matriz arbitrariamente grande, sin ningún problema.
+
+Ahora queremos sumar filas o columnas de un df:
+
+```{r}
+
+df <- data.frame(c1 = 1:10, c2 = runif(10), c3 = rnorm(10))
+
+df
+```
+
+```{r}
+sum(df$c3)
+```
+
+Suma de columnas.
+
+```{r}
+
+## Creamos un objeto 'vector'
+vector_sumas <- c()
+
+
+for (j in 1:ncol(df)) {
+        
+    vector_sumas[j] <- sum(df[ ,j]) ## Cada posición del vector corresponde a una suma
+        
+}
+
+names(vector_sumas) <- names(df)
+vector_sumas
+
+```
+
+```{r}
+colSums(df)
+```
+
+Creemos 7 variables más, para tener un df de 10 columnas:
+
+```{r}
+
+
+for(j in 4:10){
+        df[, j] <- rnorm(10, j, j)
+        
+}
+
+df
+
+```
+
+No queremos los nombres `V4`, `V5`, ..., los podemos cambiar si creamos el vector de caracteres correcto y ejecutamos `colnames(df) <- v_nombres`
+
+```{r}
+#Buena praxis
+v_nombres <- c()
+
+for (i in 1:ncol(df)) {
+        
+    v_nombres[i] <- paste0("c", i)   
+}
+
+colnames(df) <- v_nombres
+
+df
+
+```
+
+Y ahora podemos correr exactamente el mismo código de antes para obtener las sumas:
+
+```{r}
+
+## Creamos un objeto 'vector'
+vector_sumas <- c()
+
+
+for (j in 1:ncol(df)) {
+        
+    vector_sumas[j] <- sum(df[ ,j]) ## Cada posición del vector corresponde a una suma
+        
+}
+
+names(vector_sumas) <- names(df)
+vector_sumas
+
+
+```
+
+## Loops anidados
+
+![](esquema_for2.png){width="421"}
+
+Esquema en el iPad después del siguiente ejemplo.
+
+Cuando hablamos de arreglos con filas y columnas,
+
+```{r}
+
+#Buena praxis
+tabla_mult <- matrix(nrow = 10, ncol = 10)
+
+## Tabla de multiplicar
+
+for (i in 1:nrow(tabla_mult)) { 
+        
+        
+        for (j in 1:ncol(tabla_mult)) {
+                
+                tabla_mult[i,j] <- i*j ## Asignar a la coordenada (i,j)
+                                       ## el valor i*j
+                
+        }
+}
+
+
+
+tabla_mult
+```
+
+Otro ejemplo con un df:
+
+```{r}
+df
+```
+
+```{r}
+
+df
+
+df2 <- data.frame(row.names = c("c3", "c5", "c10"))
+
+for (i in 1:nrow(df)) {
+        
+        for (j in c("c3", "c5", "c10")) {
+                
+                df2[i,j] <- paste0(j, "_", i, "___", df[i,j])
+                
+        }
+}
+
+df2
+```
+
+## 'Pasos' y 'contadores' de variables y dfs (Variables Auxiliares)
+
+Uno de los **objetivos** de hacer iteraciones de un código, es ir **guardando** o **registrando** los productos de ese código. Podemos guardar:
+
+-   **Pasos**: una variable que, con cada iteración, aumenta o disminuye en una cantidad determinada o **delta**. Notación: $$var \pm \delta $$ En términos de R, podemos escribir `var <- var + 1` (por ejemplo) al final (o al principio) de cada iteración.
+
+-   **Contadores**: registros de iteraciones en las que *algo* pasó. Por ejemplo: la fila de un df supera cierto valor, o una variable es de cierta clase.
+
+-   **Objetos**: donde si queremos guardar sendo output, normalmente debemos crear el objeto (vacío) antes, e irlo poblando con métodos adecuados.
+
+### Pasos
+
+Normalmente declaramos un **valor inicial** para la variable que irá registrando los pasos, y después utilizamos una expresión del tipo `variable <- variable + delta` para modificar su valor con cada iteración. Ejemplos:
+
+```{r}
+
+## Un paso de 2 en 2:
+
+paso <- 0  ## Declaro valor inicial y tamaño del paso
+delta <- 2
+
+for (i in 1:5) {
+        
+        iteracion <- paste0("Esta es la iteración ", i)
+        paso_inicial <- paste0("El valor inicial del paso: ", paso)
+        
+        paso <- paso + delta ##Ejecuto el paso de la iteración
+        
+        paso_final <- paste0("El valor final del paso: ", paso)
+        
+        print(iteracion)
+        print(paso_inicial)
+        print(paso_final)
+        print("#######")
+        
+}
+
+```
+
+Pasos descendentes:
+
+```{r}
+
+paso_descendente <- 15
+delta_d <- 3
+
+for (i in 1:4) {
+        
+        print(paso_descendente)
+        
+        paso_descendente <- paso_descendente - delta_d
+        
+        print(paso_descendente)
+        
+}
+
+
+```
+
+### Contadores
+
+Vamos a contar cúantas veces cada columna de `df` contiene el **mínimo** [de cada fila]{style="color:blue"}. Vamos a guardar la cuenta de cada columna en un vector `cuenta_total` donde cada elemento tendrá el total de casos:
+
+(`LinearSearch`).
+
+```{r}
+df
+
+```
+
+```{r}
+## Creamos el objeto contador
+
+
+
+```
+
+```{r}
+
+cuenta_total <- rep(0, ncol(df))
+names(cuenta_total) <- colnames(df)
+cuenta_total
+
+for ( i in 1:nrow(df)) {
+        
+        pos_fila <- (df[i,] == min(df[i,]))      #Vector lógico: fila
+        nombre_columna <- colnames(df)[pos_fila]    ## Buscamos la variable en esa posición.
+        
+        cuenta_total[nombre_columna] <- cuenta_total[nombre_columna] + 1  #Contador
+}
+
+cuenta_total
+
+
+```
+
+### Objetos
+
+La idea de ir guardando output **de cada iteración** en un sólo objeto es parecida a la de hacer *pasos*. La diferencia radica en que estos objetos normalmente no pueden 'sumarse' para añadir nuevos elementos.
+
+Por lo tanto, habremos de usar **métodos específicos** de esos objetos. En este curso vamos a ver 2:
+
+-   `append()`: añade elementos **al final** de un vector. La sintaxis: vector_nuevo \<- `append(vector_viejo, vector_nuevo)` .
+
+    ```{r}
+    append(c(1,2, 2), c(3,4))
+    ```
+
+-   **Data frames**:
+
+    -   `obj_df <- df[0,]` crea un data frame vacío (0 filas) con la misma estructura de columnas que df.
+
+    ```{r}
+    df[0,]
+    str(df[0,])
+    names(df[0,])
+    ```
+
+    -   `rbind()` Si 2 data frames comparten la misma estructura de columnas,
+
+[Ejemplo con vector]{.ul}: supongamos que queremos ir guardando los números $i^i$ y $i^i + i$ de cada iteración.
+
+```{r}
+vector_potencias <- c()
+
+for (i in 1:6) {
+        
+        vector_i <- c(i^i, i^i + i)
+        vector_potencias <- append(vector_potencias, vector_i )
+        ########
+        print(vector_i)
+        print(vector_potencias)
+}
+
+
+```
+
+[Ejemplo con un df 'aleatorio']{.ul} : vamos a escoger algunos países `paises_selectos` del dataset `gapminder`, y **para cada país** vamos a filtrar sus filas por **una elección aleatoria** de entre **0 y 5 años distintos** `fechas`, generando un data frame nuevo. Vamos a guardar todos los data frames de cada iteración en un df llamado `random_gapminder`.
+
+```{r}
+gapminder <- as.data.frame(gapminder::gapminder)
+str(gapminder)
+gapminder
+```
+
+Primero creamos el vector de paises y de fechas:
+
+```{r}
+paises_selectos <- c("Mexico", "Argentina", "Chile", "Canada", "Brazil" )
+
+fechas <- unique(gapminder$year)
+
+fechas
+```
+
+```{r}
+
+```
+
+Buena práctica: crear el *contenedor* del output de cada iteración:
+
+```{r}
+random_gapminder <- gapminder[0,]
+
+str(random_gapminder)
+
+```
+
+Creamos el loop sobre `paises_selectos`
+
+```{r}
+round(5*runif(1))
+```
+
+```{r}
+### Recordar que tenemos:
+#paises_selectos
+#fechas
+#random_gapminder (vacío)
+
+random_gapminder <- gapminder[0,]
+
+for (i in paises_selectos) {
+        
+        n_muestra <- round(5*runif(1)) ## Sorteamos el número de fechas a 
+                                        # escoger. Si runif(1) da un número
+                                        # entre 0 y 1, 5*runif(1) ---> [0,5]
+        
+        fechas_selectas <- sample(fechas, n_muestra)
+        
+        ## Creamos nuestro vector lógico y filtramos sobre gapminder
+        vector_filtro <- (gapminder$country == i) &
+                        (gapminder$year %in% fechas_selectas)
+        
+        df_iteracion <- gapminder[vector_filtro,]
+        
+        
+        ##Guardamos df_iteracion en random_gapminder
+        
+        random_gapminder <- rbind(random_gapminder,df_iteracion)
+        
+        
+}
+
+
+random_gapminder
+
+
+```
+
+# Condicionales (if, else, else if)
+
+Seguramente ya conoces los condicionales en general. Aquí sólo vamos a formalizar la sintaxis, y hablar sobre un par de características desde el punto de vista de R.
+
+## If
+
+![](esquema_if_simple.png){width="627"}
+
+dentro de los paréntesis en `if(.)` se evalúa UNA expresión lógica (**no un vector, ni una matriz**). Es decir: la expresión lógica tiene que ser de dimensión 1.
+
+```{r}
+x <- 1
+
+if(x == c(1)){
+        print("código ejecutado")
+        
+}
+
+
+```
+
+Importante destacar que si la expresión evalúa `FALSE`, no se ejecuta **nada** (es como si el "if" no existiera).
+
+```{r}
+c("Mexico", "Brazil", "Cyprus") %in%  paises_selectos
+```
+
+```{r}
+
+umbral <-  sum(c("Mongolia", "Monaco", "Cyprus") %in%  paises_selectos)
+
+#########
+
+if( umbral >=1){
+        
+        c("Mexico", "Brazil", "Cyprus") %in% paises_selectos
+        
+}
+        
+paises_selectos
+
+```
+
+## Else
+
+![](esquema_if_else.png){width="632"}
+
+```{r}
+x <- 2
+if(x == 1){
+   print("código ejecutado")
+             
+}else{
+        
+   print("código ALTERNATIVO ejecutado")        
+}
+
+
+```
+
+## Else if
+
+![](esquema_elif.png)
+
+```{r}
+x <- 2
+if(x == 1){
+        
+        z <- 2
+        
+}else if(x ==2){
+        z <- 3
+        
+}else{
+         z <- 5
+}
+
+z
+```
+
+### Se toma el primer 'if' verdadero
+
+El orden de los `if-else` **sí altera el resultado**. R busca el primer lógico que evalúa a TRUE, y **detiene** el condicional.
+
+```{r}
+x <- 2
+
+if(x < 2){
+
+        print("X menor a 2")
+        
+}else if( x >= 3){
+
+        print("X mayor a 3")
+        
+}else if(x > 5){
+        
+        print("Caso importante: X muy alta")
+}else{
+        print("X mayor o igual que 2 y menor que 3")
+}
+
+```
+
+## Algunas recomendaciones en el uso de condicionales
+
+-   Mantener el número de casos limitado (es decir: el número de casos no 'escala' bien).
+
+-   En la medida de lo posible, construir casos **mutuamente excluyentes**.
+
+-   Recordar que la estructura if-else **no funciona igual que nuestra lógica.**
+
+    -   Se ejecuta el **primer caso** verdadero sin importar cuántos haya después.
+
+    -   R no sabe si la estructura que le propones es **exhaustiva** o **mutuamente excluyente**.
+
+-   Restringir uso de ifs anidados a mínimos absolutos.
+
+    -   Siempre preguntar si en vez de anidar, puedo 1. Separar tareas, 2. Obtener una expresión lógica equivalente sobre el if principal.
+
+## Ejercicio 1 (lo hacemos juntos)
+
+1.  **Sin usar condicionales** programe un loop con iteraciones del 1 al 5 y del 30 al 35 que de como resultado un vector que regrese \$i\^2 - i \$ si $i$ (la variable) es par, y 0 si es impar.
+
+```{r}
+
+v_iteracion <- append(1:5, 30:35)
+v_resultado <- c()
+
+for (i in v_iteracion) {
+        
+        v_calculos <- c(i^2 - i)*((i %% 2) == 0 )
+        
+        
+        v_resultado <- append(v_resultado, v_calculos)
+        
+}
+
+v_resultado
+```
+
+1.  Programe un loop sobre `gapminder` que tome el PIB per cápita medio de las primeras 1, 2, 3, .. filas hasta llegar a la mitad y de las últimas 1, 2, 3, ... filas hasta llegar a la mitad, los compare y regrese un vector (de longitud 852) que indique "Arriba" si en esa iteración la media de las filas de arriba es igual o mayor a la media de las filas de abajo, y "Abajo" en caso contrario.\
+
+```{r}
+gapminder
+```
+
+3.  ¿En qué porcentaje de las veces la media de "Arriba" fue igual o mayor a la de "Abajo"?
+
+## Ejercicio 2
+
+Revisar script.
+
+# Loops condicionales (while)
+
+![](esquema_while.png){width="549"}
+
+Siempre que la expresión dentro de paréntesis `while(.)` evalúe a `TRUE`, se correrá una nueva iteración. En el momento en que la expresión evalúe a `FALSE`, el loop parará.
+
+```{r}
+
+### Declaramos objetos auxiliares
+v_while <- FALSE
+
+while (v_while) {
+        
+### Bloque de código
+        
+### Actualizamos pasos, saltos, contadores, objetos        
+        
+}
+
+```
+
+## Construyendo un while loop
+
+Existen al menos 3 pasos esenciales para evitar loops infinitos o uso inadecuado de este condicional iterativo:
+
+1.  Declarar los **objetos auxiliares** ANTES del loop.
+
+2.  Verificar que los **valores iniciales** de los objetos auxiliares sean viables, i.e. puedan ser modificados en concordancia con el caso de aplicación.
+
+3.  Asegurarse de escribir los **pasos y contadores** de la manera correcta.
+
+    1.  Normalmente escritos **al final** del loop.
+
+[Ejemplo: final aleatorio]{.ul}. Un loop que termine cuando se obtiene un número aleatorio entre 0 y 1 que sea MAYOR a 0.8
+
+```{r}
+
+num_aleatorio <- 0 # Declaro variable de la condición
+
+while (num_aleatorio <= .8) {
+        
+        num_aleatorio <- runif(1) #verificamos que el valor inicial va a                                         #cambiar y que EVENTUALMENTE se alcanzará
+                                  ## (en el límite) un valor superior a .8
+        print(num_aleatorio)
+        
+        ##Aquí realmento no tenemos pasos ni contadores 
+}
+
+```
+
+En el ejemplo anterior, no llevamos ningún tipo de contabilidad. Podemos añadirla:
+
+```{r}
+num_iteracion <- 0
+num_aleatorio <- 0
+
+while (num_aleatorio <= .8) {
+        
+        num_aleatorio <- runif(1)
+        print(num_aleatorio)
+        
+        num_iteracion <- num_iteracion + 1  ## Paso de iteración
+        
+}
+
+print("Número de iteraciones:")
+print(num_iteracion)
+
+```
+
+### Integrando todo: "lo que ocurra primero"
+
+Vamos a:
+
+1.  Buscar secuencialmente sobre `gapminder` por 20 observaciones de esperanza de vida arriba de 65.
+2.  Contar más de 10 ocasiones en que obtengamos un número aleatorio superior a 0.8
+3.  Contar 3 ocasiones **consecutivas** en que se obtenga un número aleatorio inferior a 0.2
+
+El loop va a acabar cuando alguna de estas 3 cosas ocurra:
+
+-   Se alcancen las 20 observaciones de esperanza de vida arriba de 65 años
+
+-   Se exceda 10 ocasiones de un número superior a 0.8
+
+-   Suceda, en 3 ocasiones **consecutivas**, que el número aleatorio esté por debajo de 0.2
+
+```{r}
+
+contador_gapminder <- 0
+contador_p8 <- 10 ## Voy a hacer un contador descendente
+contador_p2 <- 0
+
+esperanza <- 0
+num_iteracion <- 0
+num_aleatorio <- 0
+indice_gapminder <- 1
+
+while ((contador_gapminder < 20) & (contador_p8  > 0 ) & (contador_p2 <= 2)) {
+        
+        num_aleatorio <- runif(1)
+        esperanza <- gapminder[indice_gapminder, "lifeExp"]
+        
+        if(esperanza > 65){
+                
+                contador_gapminder <- contador_gapminder +1
+        }
+        
+        
+        if(num_aleatorio < .2){
+                
+                contador_p2 <- contador_p2 +1
+                
+        }else if(num_aleatorio > .8){
+                
+                contador_p8 <- contador_p8 - 1
+                contador_p2 <- 0
+                
+        }else{contador_p2 <- 0}
+                
+        indice_gapminder <- indice_gapminder +1
+        num_iteracion <- num_iteracion + 1
+        
+        
+}
+
+
+num_iteracion
+contador_gapminder
+contador_p2
+contador_p8
+
+```
+
+# Comandos de flujo especiales en R
+
+En general no considero buena idea dotarte de muchísimos comandos extremadamente específicos, por dos razones:
+
+-   Estos comandos pueden no existir o aplicar distinto en otros lenguajes de programación que en el futuro seguramente vas a usar.
+
+-   En la enorme mayoría de ocasiones, **no son necesarios** y el mismo output puede ser conseguido con una combinación de las herramientas más generales.
+
+    -   También es cierto que en los limitados casos donde son necesarios, los comandos especiales pueden ahorrar tiempo y ser más fáciles de leer.
+
+Vamos a ver dos comandos: `next` y `break` . Ambos son herramientas para modificar el flujo 'natural' de loops e iteraciones.
+
+## Next
+
+Da la instrucción de pasar **a la siguiente iteración** de un loop
+
+```{r}
+
+for (i in 1:5) {
+        
+        print("Previo")
+        print("Posterior")
+        
+}
+
+```
+
+```{r}
+
+for (i in 1:5) {
+        
+        print("Previo")
+        
+        next
+        
+        print("Posterior")
+        
+}
+
+```
+
+Normalmente usado en combinación con un condicional para evitar el cómputo de alguna sección del loop en esa iteración.
+
+## Break
+
+Termina la ejecución de un loop donde quiera que esté.
+
+```{r}
+
+while (TRUE) {
+        print("Iteración")
+        
+        break
+        
+}
+
+```
+
+```{r}
+for (i in 1:10000) {
+        
+        if(i == 100){
+                break
+        }
+        
+}
+
+
+i
+```
+
+Igualmente usado con condicionales. En muchas ocasiones equivalente al uso de un contador.

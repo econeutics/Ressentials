@@ -1,0 +1,52 @@
+---
+title: "Sesión 2.5: Notas varias"
+output: html_notebook
+author: "Raymundo Durán"
+---
+
+# Este notebook
+
+Documento *dinámico* que nos permite tener código y texto a la vez. **No te preocupes, no tienes que aprender a usarlo**. En este curso sólo lo vamos a usar para que te sea más fácil leer el código.
+
+```{r operaciones}
+1+1
+
+log(10,10)
+
+sum(1,2,3)
+
+
+```
+
+Aquí vamos a ir desarrollando la sesión, y los ejercicios.
+
+# Atajos y utilidades del script
+
+## Correr el script completo
+
+`Ctrl` + $\uparrow$ + `Enter`
+
+Mac: `Cmd` en vez de `Ctrl`
+
+## Correr *una selección* del script
+
+1.  Seleccionamos las líneas deseadas
+
+2.  `Ctrl` + `Enter`
+
+## Darle estructura al script
+
+-   Empezar la secciones con 4 #s
+-   Seguir con al menos 2 \#
+-   Usar los menús índice
+
+# Cambiar la apariencia y orden de Rstudio
+
+> Herramientas \> Opciones
+
+Mac: Rstudio \> Preferencias
+
+Dos secciones relevantes:
+
+-   Opciones de panel
+-   Apariencia de R y código
